@@ -1,8 +1,6 @@
 import { async as fastGlob } from "fast-glob";
-import type { z } from "zod";
+import type { Config } from "./schema.ts";
 import ConfigSchema from "./schema.ts";
-
-type Config = z.infer<typeof ConfigSchema>;
 
 async function loadConfig(): Promise<Config> {
 	const configPattern = "**/autooptimize.json";

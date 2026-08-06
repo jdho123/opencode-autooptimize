@@ -15,4 +15,6 @@ const ConfigSchema = z.object({
 	iterations: z.number().int().positive(),
 });
 
+export type Config = z.infer<typeof ConfigSchema>;
+
 export default ConfigSchema;
