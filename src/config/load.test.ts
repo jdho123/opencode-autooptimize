@@ -1,5 +1,9 @@
 import { describe, expect, it, mock, spyOn } from "bun:test";
-import loadConfig from "./load";
+import loadConfig, {
+	ConfigNotFoundError,
+	ConfigParseError,
+	ConfigValidationError,
+} from "./load";
 import type { Config } from "./schema";
 
 const mockFastGlobAsync = mock();
@@ -39,9 +43,7 @@ describe("loadConfig", () => {
 	it("throws error if no configuration file found", async () => {
 		mockFastGlobAsync.mockResolvedValue([]);
 
-		await expect(loadConfig()).rejects.toThrow(
-			"No configuration file found. Please ensure that an 'autooptimize.json' file exists in your project.",
-		);
+		await expect(loadConfig()).rejects.toThrow(ConfigNotFoundError);
 	});
 
 	it("throws error if configuration file is invalid JSON", async () => {
@@ -53,9 +55,7 @@ describe("loadConfig", () => {
 			},
 		} as unknown as ReturnType<typeof Bun.file>);
 
-		await expect(loadConfig()).rejects.toThrow(
-			"Failed to parse configuration file at /fake/path/autooptimize.json. Please ensure it is valid JSON.",
-		);
+		await expect(loadConfig()).rejects.toThrow(ConfigParseError);
 	});
 
 	it("throws error if configuration file does not match schema", async () => {
@@ -68,8 +68,6 @@ describe("loadConfig", () => {
 			}),
 		} as unknown as ReturnType<typeof Bun.file>);
 
-		await expect(loadConfig()).rejects.toThrow(
-			`Configuration file at /fake/path/autooptimize.json is invalid:\n- iterations : Invalid input: expected number, received string`,
-		);
+		await expect(loadConfig()).rejects.toThrow(ConfigValidationError);
 	});
 });
